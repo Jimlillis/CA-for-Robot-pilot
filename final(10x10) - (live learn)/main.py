@@ -93,8 +93,7 @@ for x, y in trajectory:
         grid_display[x, y] = 5
 
 cmap = plt.cm.get_cmap("coolwarm", 11)
-ax.imshow(grid_display, cmap=cmap, interpolation='nearest')
-ax.set_title("Final Trajectory to Goal")
+
 plt.imshow(grid_display, cmap=cmap, interpolation='nearest')
 plt.title("Final Trajectory to Goal")
 plt.colorbar(ax.imshow(grid_display, cmap=cmap, interpolation='nearest'), ax=ax)
