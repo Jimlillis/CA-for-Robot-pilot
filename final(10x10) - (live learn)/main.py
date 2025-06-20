@@ -2,13 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 from environment import GridEnvironment
+from statistics import mean
 
 # Parameters
 grid_size = 10
 num_episodes = 500
 gamma = 0.9
 alpha = 0.1
-epsilon = 0.2
+epsilon = 1.0
+epsilon_decay = 0.995
+min_epsilon = 0.05
 
 # Create new random environment each run
 env = GridEnvironment(size=grid_size, num_obstacles=random.randint(10, 25))
@@ -28,6 +31,9 @@ Q = np.zeros((grid_size, grid_size, len(actions)))
 CA = np.zeros((grid_size, grid_size))
 
 trajectory = []
+
+episode_lengths = []
+successes = []
 
 def choose_action(state):
     if random.uniform(0, 1) < epsilon:
@@ -54,8 +60,11 @@ def update_ca():
 # Training loop
 for episode in range(num_episodes):
     state = env.start
+    steps = 0
+    
     if episode == num_episodes - 1:
         trajectory = []
+        
     while state != env.goal:
         action = choose_action(state)
         next_state = get_next_state(state, action)
@@ -66,7 +75,11 @@ for episode in range(num_episodes):
         if episode == num_episodes - 1:
             trajectory.append(state)
         state = next_state
+        steps += 1
     update_ca()
+    epsilon = max(min_epsilon, epsilon * epsilon_decay)
+    episode_lengths.append(steps)
+    successes.append(state == env.goal)
 
 # Save Q-table and grid for simulation
 np.save("q_table.npy", Q)
@@ -82,6 +95,8 @@ for x, y in trajectory:
 cmap = plt.cm.get_cmap("coolwarm", 11)
 ax.imshow(grid_display, cmap=cmap, interpolation='nearest')
 ax.set_title("Final Trajectory to Goal")
+plt.imshow(grid_display, cmap=cmap, interpolation='nearest')
+plt.title("Final Trajectory to Goal")
 plt.colorbar(ax.imshow(grid_display, cmap=cmap, interpolation='nearest'), ax=ax)
 plt.show()
 
@@ -90,3 +105,7 @@ plt.imshow(CA, cmap='hot', interpolation='nearest')
 plt.title("Cellular Automata Activity Map")
 plt.colorbar(label="Activity Level")
 plt.show()
+
+print(f"Μέσος αριθμός βημάτων ανά επεισόδιο: {mean(episode_lengths):.2f}")
+print(f"Ποσοστό επιτυχίας: {100 * sum(successes) / num_episodes:.2f}%")
+print(f"Τελικό epsilon: {epsilon:.4f}")
