@@ -507,7 +507,7 @@ def main():
         alpha=0.15
     )
     
-    print("🤖 Cellular Automaton Robot Navigation")
+    print("Cellular Automaton Robot Navigation")
     print("=====================================")
     print(f"Grid Size: {config.grid_size}x{config.grid_size}")
     print(f"Obstacle Density: {config.obstacle_density:.1%}")
@@ -526,8 +526,7 @@ def main():
     
     # Final statistics
     final_stats = trained_ca.get_statistics()
-    print("\n🏆 Final Results:")
-    print("================")
+    print("\n Final Results:")
     for key, value in final_stats.items():
         print(f"{key}: {value:.3f}")
 
